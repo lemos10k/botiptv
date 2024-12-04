@@ -1,0 +1,119 @@
+const qrcode = require("qrcode-terminal");
+const { Client, Buttons, List, MessageMedia } = require("whatsapp-web.js");
+const client = new Client();
+
+const delay = (ms) => new Promise((res) => setTimeout(res, ms)); // Função para criar atraso
+
+// Escutando o QR Code
+client.on("qr", (qr) => {
+  qrcode.generate(qr, { small: true });
+});
+
+// Confirmando conexão
+client.on("ready", () => {
+  console.log("✅ WhatsApp conectado com sucesso!");
+});
+
+// Inicializa o cliente
+client.initialize();
+
+// Funil de mensagens
+client.on("message", async (msg) => {
+  try {
+    // Exibir menu inicial
+    if (
+      /(menu|Tudo bem|Menu|Bom dia|Boa tarde|Boa noite|oi|Oi|Olá|olá|ola|Ola)/i.test(msg.body) &&
+      msg.from.endsWith("@c.us")
+    ) {
+      const chat = await msg.getChat();
+      await chat.sendStateTyping(); // Indicando digitação
+      await delay(3000);
+
+      const contact = await msg.getContact();
+      const name = contact.pushname || "Cliente";
+
+      await client.sendMessage(
+        msg.from,
+        `Olá, ${
+          name.split(" ")[0]
+        }! 👋 Sou o assistente virtual da nossa Loja de IPTV.\n\n` +
+          `Por favor, escolha uma opção abaixo:\n\n` +
+          `1️⃣ - Planos e preços\n` +
+          `2️⃣ - Como funciona\n` +
+          `3️⃣ - Teste grátis\n` +
+          `4️⃣ - Suporte técnico\n` +
+          `5️⃣ - Outras dúvidas`
+      );
+    }
+
+    // Opções do menu
+    if (msg.body === "1" && msg.from.endsWith("@c.us")) {
+      const chat = await msg.getChat();
+      await chat.sendStateTyping();
+      await delay(3000);
+
+      await client.sendMessage(
+        msg.from,
+        `📺 *Planos de IPTV*\n\n` +
+          `✅ Mensal: R$ 30,00\n` +
+          `✅ Trimestral: R$ 80,00\n` +
+          `✅ Anual: R$ 250,00\n\n` +
+          `🔗 *Adquira agora*: https://site.com`
+      );
+    }
+
+    if (msg.body === "2" && msg.from.endsWith("@c.us")) {
+      const chat = await msg.getChat();
+      await chat.sendStateTyping();
+      await delay(3000);
+
+      await client.sendMessage(
+        msg.from,
+        `🛠️ *Como funciona o IPTV*\n\n` +
+          `1️⃣ Escolha um plano.\n` +
+          `2️⃣ Pague via Pix ou cartão.\n` +
+          `3️⃣ Receba acesso e instruções.\n\n` +
+          `🔗 Comece agora: https://site.com`
+      );
+    }
+
+    if (msg.body === "3" && msg.from.endsWith("@c.us")) {
+      const chat = await msg.getChat();
+      await chat.sendStateTyping();
+      await delay(3000);
+
+      await client.sendMessage(
+        msg.from,
+        `🎯 *Teste grátis disponível!*\n\n` +
+          `✅ Receba 24 horas de acesso grátis.\n\n` +
+          `Para solicitar, envie: *#testegrátis*`
+      );
+    }
+
+    if (msg.body === "4" && msg.from.endsWith("@c.us")) {
+      const chat = await msg.getChat();
+      await chat.sendStateTyping();
+      await delay(3000);
+
+      await client.sendMessage(
+        msg.from,
+        `🔧 *Suporte Técnico*\n\n` +
+          `Explique seu problema e nossa equipe ajudará você.`
+      );
+    }
+
+    if (msg.body === "5" && msg.from.endsWith("@c.us")) {
+      const chat = await msg.getChat();
+      await chat.sendStateTyping();
+      await delay(3000);
+
+      await client.sendMessage(
+        msg.from,
+        `📩 *Outras Dúvidas*\n\n` +
+          `Entre em contato conosco aqui ou acesse: https://site.com`
+      );
+    }
+  } catch (error) {
+    console.error("Erro ao processar mensagem:", error);
+  }
+});
